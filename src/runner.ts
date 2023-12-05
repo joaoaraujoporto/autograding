@@ -111,9 +111,6 @@ const runSetup = async (test: Test, cwd: string, timeout: number): Promise<void>
     },
   })
 
-  // Start with a single new line
-  process.stdout.write(indent('\n'))
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setup.stdout.on('data', (chunk) => {
     process.stdout.write(indent(chunk))
@@ -141,9 +138,6 @@ const runCommand = async (test: Test, cwd: string, timeout: number): Promise<voi
   })
 
   let output = ''
-
-  // Start with a single new line
-  process.stdout.write(indent('\n'))
 
   child.stdout.on('data', (chunk) => {
     process.stdout.write(indent(chunk))
@@ -222,18 +216,16 @@ export const runAll = async (tests: Array<Test>, cwd: string): Promise<void> => 
         availablePoints += test.points
       }
       log(color.cyan(`📝 ${test.name}`))
-      log('')
-      await run(test, cwd)
-      log('')
+      run(test, cwd)
       log(color.green(`✅ ${test.name}`))
-      log(``)
+      log('')
       if (test.points) {
         points += test.points
       }
     } catch (error) {
       failed = true
-      log('')
       log(color.red(`❌ ${test.name}`))
+      log('')
       if (error instanceof Error) {
         core.setFailed(error.message)
       } else {
@@ -243,18 +235,17 @@ export const runAll = async (tests: Array<Test>, cwd: string): Promise<void> => 
   }
 
   // Restart command processing
-  log('')
   log(`::${token}::`)
+  log('')
 
   if (failed) {
-    // We need a good failure experience
+    log(color.red('One or more tests failed'))
   } else {
-    log('')
     log(color.green('All tests passed'))
-    log('')
     log('✨🌟💖💎🦄💎💖🌟✨🌟💖💎🦄💎💖🌟✨')
-    log('')
   }
+
+  log('')
 
   // Set the number of points
   if (hasPoints) {
